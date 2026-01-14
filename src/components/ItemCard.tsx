@@ -1,6 +1,7 @@
 import React from 'react';
 import type { ClearanceItem } from '../data/clearanceData';
 import { getPrintImageUrl } from '../data/printImages';
+import { getCustomImageUrl } from '../data/customImages';
 import './ItemCard.css';
 
 interface ItemCardProps {
@@ -25,13 +26,16 @@ export const ItemCard: React.FC<ItemCardProps> = ({ item, onPrintClick }) => {
         <h4>Available Prints ({item.prints.length}):</h4>
         <div className="prints-grid">
           {item.prints.map((print, index) => {
-            const imageUrl = getPrintImageUrl(print);
+            const customUrl = getCustomImageUrl(item.name, print);
+            const defaultUrl = getPrintImageUrl(print);
+            const imageUrl = customUrl || defaultUrl;
+            const hasCustomImage = !!customUrl;
             return (
               <button
                 key={index}
-                className="print-tag"
+                className={`print-tag ${hasCustomImage ? 'has-custom' : ''}`}
                 onClick={() => onPrintClick?.(print)}
-                title={`Click to view ${print}`}
+                title={`Click to view ${print}${hasCustomImage ? ' (custom image)' : ''}`}
               >
                 {imageUrl ? (
                   <div className="print-thumbnail-wrapper">
