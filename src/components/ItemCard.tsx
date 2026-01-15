@@ -31,10 +31,10 @@ const PrintButton: React.FC<{
             alt={print}
             className="print-thumbnail"
             loading="lazy"
-            onError={(e) => {
+            /*onError={(e) => {
               //const target = e.target as HTMLImageElement;
               //target.style.display = 'none';
-            }}
+            }}*/
           />
           <span className="print-name">{print}</span>
         </div>
