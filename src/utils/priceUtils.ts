@@ -51,7 +51,11 @@ const SIZE_SEQUENCES: { [key: string]: string[] } = {
   'preemie-to-baby': ['Preemie', 'NB', '0-3M', '3-6M', '6-12M', '12-18M', '18-24M'],
   'nb-to-baby': ['NB', '0-3M', '3-6M', '6-12M', '12-18M', '18-24M'],
 
-  // Baby to toddler
+  // NB to toddler
+  'nb-to-toddler-4t': ['NB', '0-3M', '3-6M', '6-12M', '12-18M', '18-24M', '2T', '3T', '4T'],
+  'nb-to-toddler-7': ['NB', '0-3M', '3-6M', '6-12M', '12-18M', '18-24M', '2T', '3T', '4T', '5T', '6T', '7'],
+
+  // Baby to toddler (starting from 0-3M)
   'baby-to-toddler-4t': ['0-3M', '3-6M', '6-12M', '12-18M', '18-24M', '2T', '3T', '4T'],
   'baby-to-toddler-7': ['0-3M', '3-6M', '6-12M', '12-18M', '18-24M', '2T', '3T', '4T', '5T', '6T', '7'],
   '12m-to-7': ['12-18M', '18-24M', '2T', '3T', '4T', '5T', '6T', '7'],
