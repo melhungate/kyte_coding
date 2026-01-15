@@ -8,6 +8,7 @@ type SaleDay = 'all' | 'friday' | 'sunday';
 interface ItemCardProps {
   item: ClearanceItem;
   filterDay: SaleDay;
+  searchTerm?: string;
   onPrintClick?: (printName: string) => void;
 }
 
@@ -45,16 +46,26 @@ const PrintButton: React.FC<{
   );
 };
 
-export const ItemCard: React.FC<ItemCardProps> = ({ item, filterDay, onPrintClick }) => {
-  //const totalPrints = item.fridayPrints.length + item.sundayPrints.length;
+export const ItemCard: React.FC<ItemCardProps> = ({ item, filterDay, searchTerm, onPrintClick }) => {
+  // Filter prints based on search term
+  const filterPrints = (prints: string[]) => {
+    if (!searchTerm) return prints;
+    const searchLower = searchTerm.toLowerCase();
+    // Only filter prints if the search term doesn't match the item name
+    if (item.name.toLowerCase().includes(searchLower)) return prints;
+    return prints.filter(print => print.toLowerCase().includes(searchLower));
+  };
+
+  const filteredFridayPrints = filterPrints(item.fridayPrints);
+  const filteredSundayPrints = filterPrints(item.sundayPrints);
 
   const renderPrintsSection = () => {
     if (filterDay === 'friday') {
       return (
         <div className="prints-section">
-          <h4>Friday Prints ({item.fridayPrints.length}):</h4>
+          <h4>Friday Prints ({filteredFridayPrints.length}):</h4>
           <div className="prints-grid">
-            {item.fridayPrints.map((print, index) => (
+            {filteredFridayPrints.map((print, index) => (
               <PrintButton
                 key={`fri-${index}`}
                 print={print}
@@ -69,9 +80,9 @@ export const ItemCard: React.FC<ItemCardProps> = ({ item, filterDay, onPrintClic
     if (filterDay === 'sunday') {
       return (
         <div className="prints-section">
-          <h4>Sunday Prints ({item.sundayPrints.length}):</h4>
+          <h4>Sunday Prints ({filteredSundayPrints.length}):</h4>
           <div className="prints-grid">
-            {item.sundayPrints.map((print, index) => (
+            {filteredSundayPrints.map((print, index) => (
               <PrintButton
                 key={`sun-${index}`}
                 print={print}
@@ -86,11 +97,11 @@ export const ItemCard: React.FC<ItemCardProps> = ({ item, filterDay, onPrintClic
     // Show all prints organized by day
     return (
       <>
-        {item.fridayPrints.length > 0 && (
+        {filteredFridayPrints.length > 0 && (
           <div className="prints-section friday-section">
-            <h4 className="day-header friday-header">Friday ({item.fridayPrints.length})</h4>
+            <h4 className="day-header friday-header">Friday ({filteredFridayPrints.length})</h4>
             <div className="prints-grid">
-              {item.fridayPrints.map((print, index) => (
+              {filteredFridayPrints.map((print, index) => (
                 <PrintButton
                   key={`fri-${index}`}
                   print={print}
@@ -101,11 +112,11 @@ export const ItemCard: React.FC<ItemCardProps> = ({ item, filterDay, onPrintClic
             </div>
           </div>
         )}
-        {item.sundayPrints.length > 0 && (
+        {filteredSundayPrints.length > 0 && (
           <div className="prints-section sunday-section">
-            <h4 className="day-header sunday-header">Sunday ({item.sundayPrints.length})</h4>
+            <h4 className="day-header sunday-header">Sunday ({filteredSundayPrints.length})</h4>
             <div className="prints-grid">
-              {item.sundayPrints.map((print, index) => (
+              {filteredSundayPrints.map((print, index) => (
                 <PrintButton
                   key={`sun-${index}`}
                   print={print}

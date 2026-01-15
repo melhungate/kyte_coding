@@ -94,6 +94,7 @@ function App() {
               key={item.id}
               item={item}
               filterDay={filterDay}
+              searchTerm={searchTerm}
               onPrintClick={(printName) => setSelectedPrint({ printName, itemName: item.name })}
             />
           ))
