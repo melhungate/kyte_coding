@@ -1,14 +1,15 @@
 .item-card {
   background: white;
-  border-radius: 12px;
+  border-radius: 8px;
   padding: 20px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
   transition: transform 0.2s, box-shadow 0.2s;
+  border: 1px solid #E5E5E4;
 }
 
 .item-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .item-header {
@@ -22,17 +23,18 @@
 .item-header h3 {
   margin: 0;
   font-size: 16px;
-  color: #333;
+  color: #000000;
   line-height: 1.3;
+  font-weight: 600;
 }
 
 .category-badge {
-  background-color: #e8f4f8;
-  color: #0d7a99;
+  background-color: #D9C5A7;
+  color: #000000;
   padding: 4px 10px;
-  border-radius: 20px;
+  border-radius: 4px;
   font-size: 11px;
-  font-weight: 600;
+  font-weight: 500;
   white-space: nowrap;
   flex-shrink: 0;
 }
@@ -45,7 +47,7 @@
 }
 
 .item-meta .price {
-  background: #2ecc71;
+  background: #2E9E7B;
   color: white;
   padding: 4px 10px;
   border-radius: 4px;
@@ -54,8 +56,8 @@
 }
 
 .item-meta .sizes {
-  background: #f5f5f5;
-  color: #666;
+  background: #FBF6F3;
+  color: #737373;
   padding: 4px 10px;
   border-radius: 4px;
   font-size: 12px;
@@ -68,7 +70,7 @@
 .prints-section h4 {
   margin: 0 0 10px 0;
   font-size: 13px;
-  color: #666;
+  color: #737373;
   font-weight: 500;
 }
 
@@ -79,11 +81,11 @@
 }
 
 .print-tag {
-  background-color: #f8f9fa;
-  border: 1px solid #e0e0e0;
-  color: #333;
+  background-color: #FBF6F3;
+  border: 1px solid #E5E5E4;
+  color: #000000;
   padding: 0;
-  border-radius: 8px;
+  border-radius: 6px;
   font-size: 11px;
   cursor: pointer;
   transition: all 0.2s;
@@ -93,8 +95,8 @@
 }
 
 .print-tag:hover {
-  border-color: #0d7a99;
-  box-shadow: 0 2px 8px rgba(13, 122, 153, 0.2);
+  border-color: #000000;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   transform: scale(1.05);
 }
 
@@ -108,7 +110,7 @@
   width: 100%;
   height: 50px;
   object-fit: cover;
-  border-radius: 6px 6px 0 0;
+  border-radius: 5px 5px 0 0;
 }
 
 .print-name {
@@ -116,7 +118,7 @@
   text-align: center;
   font-size: 10px;
   line-height: 1.2;
-  color: #333;
+  color: #000000;
   word-break: break-word;
 }
 
@@ -125,31 +127,21 @@
   display: block;
   text-align: center;
   font-size: 11px;
-  color: #0d7a99;
+  color: #000000;
 }
 
 .item-notes {
   font-size: 12px;
-  color: #888;
+  color: #737373;
   margin: 0;
   font-style: italic;
   padding-top: 8px;
-  border-top: 1px solid #f0f0f0;
-}
-
-.print-tag.has-custom {
-  border-color: #2ecc71;
-  box-shadow: 0 0 0 2px rgba(46, 204, 113, 0.2);
-}
-
-.print-tag.has-custom:hover {
-  border-color: #27ae60;
-  box-shadow: 0 2px 8px rgba(46, 204, 113, 0.3);
+  border-top: 1px solid #E5E5E4;
 }
 
 .item-meta .print-count {
-  background: #f0f0f0;
-  color: #666;
+  background: #FBF6F3;
+  color: #737373;
   padding: 4px 10px;
   border-radius: 4px;
   font-size: 12px;
@@ -165,21 +157,21 @@
 }
 
 .friday-header {
-  background-color: #fdecea;
-  color: #e74c3c;
+  background-color: #fce8e6;
+  color: #c0392b;
 }
 
 .sunday-header {
-  background-color: #f3e8f8;
-  color: #9b59b6;
+  background-color: #f3e5f5;
+  color: #8e44ad;
 }
 
 .friday-section {
-  border-left: 3px solid #e74c3c;
+  border-left: 3px solid #c0392b;
   padding-left: 12px;
 }
 
 .sunday-section {
-  border-left: 3px solid #9b59b6;
+  border-left: 3px solid #8e44ad;
   padding-left: 12px;
 }

@@ -1,10 +1,14 @@
 :root {
-  --primary-color: #0d7a99;
-  --primary-light: #e8f4f8;
-  --text-dark: #333;
-  --text-light: #666;
-  --border-color: #e0e0e0;
-  --bg-color: #f9fafb;
+  --primary-color: #000000;
+  --primary-light: #FBF6F3;
+  --accent-color: #D9C5A7;
+  --text-dark: #000000;
+  --text-light: #737373;
+  --border-color: #E5E5E4;
+  --bg-color: #FBF6F3;
+  --success-color: #2E9E7B;
+  --friday-color: #c0392b;
+  --sunday-color: #8e44ad;
 }
 
 * {
@@ -14,27 +18,28 @@
 .app {
   min-height: 100vh;
   background-color: var(--bg-color);
-  padding-bottom: 100px;
+  padding-bottom: 60px;
 }
 
 .app-header {
-  background: linear-gradient(135deg, var(--primary-color) 0%, #0a5a7a 100%);
+  background: var(--primary-color);
   color: white;
   padding: 40px 20px;
   text-align: center;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .app-header h1 {
   margin: 0;
   font-size: 32px;
-  font-weight: 700;
+  font-weight: 600;
+  letter-spacing: 1px;
 }
 
 .subtitle {
   margin: 8px 0 0 0;
-  font-size: 16px;
-  opacity: 0.9;
+  font-size: 14px;
+  opacity: 0.8;
+  letter-spacing: 0.5px;
 }
 
 .controls {
@@ -45,18 +50,18 @@
 
 .search-input {
   width: 100%;
-  padding: 12px 16px;
+  padding: 14px 18px;
   font-size: 14px;
-  border: 2px solid var(--border-color);
-  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
   margin-bottom: 20px;
   transition: border-color 0.2s;
+  background: white;
 }
 
 .search-input:focus {
   outline: none;
   border-color: var(--primary-color);
-  box-shadow: 0 0 0 3px rgba(13, 122, 153, 0.1);
 }
 
 .day-filter {
@@ -69,25 +74,24 @@
 
 .filter-label {
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 500;
   color: var(--text-dark);
 }
 
 .day-button {
   padding: 10px 20px;
-  border: 2px solid var(--border-color);
+  border: 1px solid var(--border-color);
   background-color: white;
   color: var(--text-dark);
-  border-radius: 8px;
+  border-radius: 4px;
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
 }
 
 .day-button:hover {
   border-color: var(--primary-color);
-  color: var(--primary-color);
 }
 
 .day-button.active {
@@ -97,23 +101,23 @@
 }
 
 .day-button.friday.active {
-  background-color: #e74c3c;
-  border-color: #e74c3c;
+  background-color: var(--friday-color);
+  border-color: var(--friday-color);
 }
 
 .day-button.sunday.active {
-  background-color: #9b59b6;
-  border-color: #9b59b6;
+  background-color: var(--sunday-color);
+  border-color: var(--sunday-color);
 }
 
 .day-button.friday:hover:not(.active) {
-  border-color: #e74c3c;
-  color: #e74c3c;
+  border-color: var(--friday-color);
+  color: var(--friday-color);
 }
 
 .day-button.sunday:hover:not(.active) {
-  border-color: #9b59b6;
-  color: #9b59b6;
+  border-color: var(--sunday-color);
+  color: var(--sunday-color);
 }
 
 .filter-buttons {
@@ -125,10 +129,10 @@
 
 .filter-button {
   padding: 8px 16px;
-  border: 2px solid var(--border-color);
+  border: 1px solid var(--border-color);
   background-color: white;
   color: var(--text-dark);
-  border-radius: 20px;
+  border-radius: 4px;
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
@@ -137,7 +141,6 @@
 
 .filter-button:hover {
   border-color: var(--primary-color);
-  color: var(--primary-color);
 }
 
 .filter-button.active {
@@ -181,5 +184,9 @@
     justify-content: flex-start;
     overflow-x: auto;
     padding-bottom: 8px;
+  }
+
+  .day-filter {
+    flex-wrap: wrap;
   }
 }

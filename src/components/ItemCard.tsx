@@ -1,7 +1,6 @@
 import React from 'react';
 import type { ClearanceItem } from '../data/clearanceData';
 import { getPrintImageUrl } from '../data/printImages';
-import { getCustomImageUrl } from '../data/customImages';
 import './ItemCard.css';
 
 type SaleDay = 'all' | 'friday' | 'sunday';
@@ -14,20 +13,16 @@ interface ItemCardProps {
 
 const PrintButton: React.FC<{
   print: string;
-  itemName: string;
   dayLabel?: string;
   onClick?: () => void;
-}> = ({ print, itemName, dayLabel, onClick }) => {
-  const customUrl = getCustomImageUrl(itemName, print);
-  const defaultUrl = getPrintImageUrl(print);
-  const imageUrl = customUrl || defaultUrl;
-  const hasCustomImage = !!customUrl;
+}> = ({ print, dayLabel, onClick }) => {
+  const imageUrl = getPrintImageUrl(print);
 
   return (
     <button
-      className={`print-tag ${hasCustomImage ? 'has-custom' : ''}`}
+      className="print-tag"
       onClick={onClick}
-      title={`Click to view ${print}${hasCustomImage ? ' (custom image)' : ''}${dayLabel ? ` - ${dayLabel}` : ''}`}
+      title={`Click to view ${print}${dayLabel ? ` - ${dayLabel}` : ''}`}
     >
       {imageUrl ? (
         <div className="print-thumbnail-wrapper">
@@ -63,7 +58,6 @@ export const ItemCard: React.FC<ItemCardProps> = ({ item, filterDay, onPrintClic
               <PrintButton
                 key={`fri-${index}`}
                 print={print}
-                itemName={item.name}
                 onClick={() => onPrintClick?.(print)}
               />
             ))}
@@ -81,7 +75,6 @@ export const ItemCard: React.FC<ItemCardProps> = ({ item, filterDay, onPrintClic
               <PrintButton
                 key={`sun-${index}`}
                 print={print}
-                itemName={item.name}
                 onClick={() => onPrintClick?.(print)}
               />
             ))}
@@ -101,7 +94,6 @@ export const ItemCard: React.FC<ItemCardProps> = ({ item, filterDay, onPrintClic
                 <PrintButton
                   key={`fri-${index}`}
                   print={print}
-                  itemName={item.name}
                   dayLabel="Friday"
                   onClick={() => onPrintClick?.(print)}
                 />
@@ -117,7 +109,6 @@ export const ItemCard: React.FC<ItemCardProps> = ({ item, filterDay, onPrintClic
                 <PrintButton
                   key={`sun-${index}`}
                   print={print}
-                  itemName={item.name}
                   dayLabel="Sunday"
                   onClick={() => onPrintClick?.(print)}
                 />

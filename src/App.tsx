@@ -4,7 +4,6 @@ import { sampleItems } from './data/clearanceData'
 import type { ClearanceItem } from './data/clearanceData'
 import { ItemCard } from './components/ItemCard'
 import { PrintGallery } from './components/PrintGallery'
-import { DataManager } from './components/DataManager'
 
 interface SelectedPrint {
   printName: string;
@@ -14,12 +13,11 @@ interface SelectedPrint {
 type SaleDay = 'all' | 'friday' | 'sunday';
 
 function App() {
-  const [items, setItems] = useState<ClearanceItem[]>(sampleItems)
+  const [items] = useState<ClearanceItem[]>(sampleItems)
   const [selectedPrint, setSelectedPrint] = useState<SelectedPrint | undefined>()
   const [filterCategory, setFilterCategory] = useState<string>('all')
   const [filterDay, setFilterDay] = useState<SaleDay>('all')
   const [searchTerm, setSearchTerm] = useState('')
-  const [imageVersion, setImageVersion] = useState(0)
 
   // Get unique categories
   const categories = ['all', ...Array.from(new Set(items.map(item => item.category)))]
@@ -93,7 +91,7 @@ function App() {
         {filteredItems.length > 0 ? (
           filteredItems.map(item => (
             <ItemCard
-              key={`${item.id}-${imageVersion}`}
+              key={item.id}
               item={item}
               filterDay={filterDay}
               onPrintClick={(printName) => setSelectedPrint({ printName, itemName: item.name })}
@@ -110,13 +108,6 @@ function App() {
         printName={selectedPrint?.printName}
         itemName={selectedPrint?.itemName}
         onClose={() => setSelectedPrint(undefined)}
-        onImageChange={() => setImageVersion(v => v + 1)}
-      />
-
-      <DataManager
-        onItemsUpdate={setItems}
-        currentItems={items}
-        onImageChange={() => setImageVersion(v => v + 1)}
       />
     </div>
   )
