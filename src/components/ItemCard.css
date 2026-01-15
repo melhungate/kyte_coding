@@ -146,3 +146,40 @@
   border-color: #27ae60;
   box-shadow: 0 2px 8px rgba(46, 204, 113, 0.3);
 }
+
+.item-meta .print-count {
+  background: #f0f0f0;
+  color: #666;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+.day-header {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.friday-header {
+  background-color: #fdecea;
+  color: #e74c3c;
+}
+
+.sunday-header {
+  background-color: #f3e8f8;
+  color: #9b59b6;
+}
+
+.friday-section {
+  border-left: 3px solid #e74c3c;
+  padding-left: 12px;
+}
+
+.sunday-section {
+  border-left: 3px solid #9b59b6;
+  padding-left: 12px;
+}

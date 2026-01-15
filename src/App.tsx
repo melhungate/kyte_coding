@@ -11,10 +11,13 @@ interface SelectedPrint {
   itemName: string;
 }
 
+type SaleDay = 'all' | 'friday' | 'sunday';
+
 function App() {
   const [items, setItems] = useState<ClearanceItem[]>(sampleItems)
   const [selectedPrint, setSelectedPrint] = useState<SelectedPrint | undefined>()
   const [filterCategory, setFilterCategory] = useState<string>('all')
+  const [filterDay, setFilterDay] = useState<SaleDay>('all')
   const [searchTerm, setSearchTerm] = useState('')
   const [imageVersion, setImageVersion] = useState(0)
 
@@ -24,10 +27,15 @@ function App() {
   // Filter items
   const filteredItems = items.filter(item => {
     const matchCategory = filterCategory === 'all' || item.category === filterCategory
-    const matchSearch = searchTerm === '' || 
+    const allPrints = [...item.fridayPrints, ...item.sundayPrints];
+    const matchSearch = searchTerm === '' ||
       item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.prints.some(p => p.toLowerCase().includes(searchTerm.toLowerCase()))
-    return matchCategory && matchSearch
+      allPrints.some(p => p.toLowerCase().includes(searchTerm.toLowerCase()))
+    // Also filter out items that have no prints for the selected day
+    const hasPrintsForDay = filterDay === 'all'
+      ? allPrints.length > 0
+      : (filterDay === 'friday' ? item.fridayPrints.length > 0 : item.sundayPrints.length > 0)
+    return matchCategory && matchSearch && hasPrintsForDay
   })
 
   return (
@@ -45,7 +53,29 @@ function App() {
           onChange={(e) => setSearchTerm(e.target.value)}
           className="search-input"
         />
-        
+
+        <div className="day-filter">
+          <span className="filter-label">Sale Day:</span>
+          <button
+            className={`day-button ${filterDay === 'all' ? 'active' : ''}`}
+            onClick={() => setFilterDay('all')}
+          >
+            All Days
+          </button>
+          <button
+            className={`day-button friday ${filterDay === 'friday' ? 'active' : ''}`}
+            onClick={() => setFilterDay('friday')}
+          >
+            Friday
+          </button>
+          <button
+            className={`day-button sunday ${filterDay === 'sunday' ? 'active' : ''}`}
+            onClick={() => setFilterDay('sunday')}
+          >
+            Sunday
+          </button>
+        </div>
+
         <div className="filter-buttons">
           {categories.map(category => (
             <button
@@ -53,7 +83,7 @@ function App() {
               className={`filter-button ${filterCategory === category ? 'active' : ''}`}
               onClick={() => setFilterCategory(category)}
             >
-              {category === 'all' ? '📦 All Items' : category}
+              {category === 'all' ? 'All Items' : category}
             </button>
           ))}
         </div>
@@ -65,6 +95,7 @@ function App() {
             <ItemCard
               key={`${item.id}-${imageVersion}`}
               item={item}
+              filterDay={filterDay}
               onPrintClick={(printName) => setSelectedPrint({ printName, itemName: item.name })}
             />
           ))
