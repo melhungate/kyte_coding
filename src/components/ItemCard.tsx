@@ -32,7 +32,7 @@ const PrintButton: React.FC<{
             className="print-thumbnail"
             loading="lazy"
             onError={(e) => {
-              const target = e.target as HTMLImageElement;
+              //const target = e.target as HTMLImageElement;
               //target.style.display = 'none';
             }}
           />
@@ -46,7 +46,7 @@ const PrintButton: React.FC<{
 };
 
 export const ItemCard: React.FC<ItemCardProps> = ({ item, filterDay, onPrintClick }) => {
-  const totalPrints = item.fridayPrints.length + item.sundayPrints.length;
+  //const totalPrints = item.fridayPrints.length + item.sundayPrints.length;
 
   const renderPrintsSection = () => {
     if (filterDay === 'friday') {
