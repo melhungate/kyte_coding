@@ -33,7 +33,7 @@ const PrintButton: React.FC<{
             loading="lazy"
             onError={(e) => {
               const target = e.target as HTMLImageElement;
-              target.style.display = 'none';
+              //target.style.display = 'none';
             }}
           />
           <span className="print-name">{print}</span>
