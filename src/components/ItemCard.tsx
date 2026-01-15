@@ -10,43 +10,56 @@ interface ItemCardProps {
   filterDay: SaleDay;
   searchTerm?: string;
   onPrintClick?: (printName: string) => void;
+  onWishlistClick?: (printName: string, day: 'friday' | 'sunday') => void;
 }
 
 const PrintButton: React.FC<{
   print: string;
   dayLabel?: string;
   onClick?: () => void;
-}> = ({ print, dayLabel, onClick }) => {
+  onWishlistClick?: () => void;
+}> = ({ print, dayLabel, onClick, onWishlistClick }) => {
   const imageUrl = getPrintImageUrl(print);
 
+  const handleWishlistClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onWishlistClick?.();
+  };
+
   return (
-    <button
-      className="print-tag"
-      onClick={onClick}
-      title={`Click to view ${print}${dayLabel ? ` - ${dayLabel}` : ''}`}
-    >
-      {imageUrl ? (
-        <div className="print-thumbnail-wrapper">
-          <img
-            src={imageUrl}
-            alt={print}
-            className="print-thumbnail"
-            loading="lazy"
-            /*onError={(e) => {
-              //const target = e.target as HTMLImageElement;
-              //target.style.display = 'none';
-            }}*/
-          />
-          <span className="print-name">{print}</span>
-        </div>
-      ) : (
-        <span className="print-name-only">{print}</span>
-      )}
-    </button>
+    <div className="print-tag-wrapper">
+      <button
+        className="print-tag"
+        onClick={onClick}
+        title={`Click to view ${print}${dayLabel ? ` - ${dayLabel}` : ''}`}
+      >
+        {imageUrl ? (
+          <div className="print-thumbnail-wrapper">
+            <img
+              src={imageUrl}
+              alt={print}
+              className="print-thumbnail"
+              loading="lazy"
+            />
+            <span className="print-name">{print}</span>
+          </div>
+        ) : (
+          <span className="print-name-only">{print}</span>
+        )}
+      </button>
+      <button
+        className="wishlist-btn"
+        onClick={handleWishlistClick}
+        title="Add to wishlist"
+        aria-label={`Add ${print} to wishlist`}
+      >
+        ♡
+      </button>
+    </div>
   );
 };
 
-export const ItemCard: React.FC<ItemCardProps> = ({ item, filterDay, searchTerm, onPrintClick }) => {
+export const ItemCard: React.FC<ItemCardProps> = ({ item, filterDay, searchTerm, onPrintClick, onWishlistClick }) => {
   // Filter prints based on search term
   const filterPrints = (prints: string[]) => {
     if (!searchTerm) return prints;
@@ -70,6 +83,7 @@ export const ItemCard: React.FC<ItemCardProps> = ({ item, filterDay, searchTerm,
                 key={`fri-${index}`}
                 print={print}
                 onClick={() => onPrintClick?.(print)}
+                onWishlistClick={() => onWishlistClick?.(print, 'friday')}
               />
             ))}
           </div>
@@ -87,6 +101,7 @@ export const ItemCard: React.FC<ItemCardProps> = ({ item, filterDay, searchTerm,
                 key={`sun-${index}`}
                 print={print}
                 onClick={() => onPrintClick?.(print)}
+                onWishlistClick={() => onWishlistClick?.(print, 'sunday')}
               />
             ))}
           </div>
@@ -107,6 +122,7 @@ export const ItemCard: React.FC<ItemCardProps> = ({ item, filterDay, searchTerm,
                   print={print}
                   dayLabel="Friday"
                   onClick={() => onPrintClick?.(print)}
+                  onWishlistClick={() => onWishlistClick?.(print, 'friday')}
                 />
               ))}
             </div>
@@ -122,6 +138,7 @@ export const ItemCard: React.FC<ItemCardProps> = ({ item, filterDay, searchTerm,
                   print={print}
                   dayLabel="Sunday"
                   onClick={() => onPrintClick?.(print)}
+                  onWishlistClick={() => onWishlistClick?.(print, 'sunday')}
                 />
               ))}
             </div>

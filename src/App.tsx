@@ -4,20 +4,46 @@ import { sampleItems } from './data/clearanceData'
 import type { ClearanceItem } from './data/clearanceData'
 import { ItemCard } from './components/ItemCard'
 import { PrintGallery } from './components/PrintGallery'
+import { WishlistProvider, useWishlist } from './context/WishlistContext'
+import { WishlistSidebar } from './components/WishlistSidebar'
+import { AddToWishlistModal } from './components/AddToWishlistModal'
 
 interface SelectedPrint {
   printName: string;
   itemName: string;
 }
 
+interface WishlistModalData {
+  itemId: string;
+  itemName: string;
+  printName: string;
+  day: 'friday' | 'sunday';
+  sizes: string | undefined;
+  price: string | undefined;
+}
+
 type SaleDay = 'all' | 'friday' | 'sunday';
 
-function App() {
+function AppContent() {
   const [items] = useState<ClearanceItem[]>(sampleItems)
   const [selectedPrint, setSelectedPrint] = useState<SelectedPrint | undefined>()
   const [filterCategory, setFilterCategory] = useState<string>('all')
   const [filterDay, setFilterDay] = useState<SaleDay>('all')
   const [searchTerm, setSearchTerm] = useState('')
+  const [wishlistOpen, setWishlistOpen] = useState(false)
+  const [wishlistModal, setWishlistModal] = useState<WishlistModalData | null>(null)
+  const { items: wishlistItems } = useWishlist()
+
+  const handleWishlistClick = (item: ClearanceItem, printName: string, day: 'friday' | 'sunday') => {
+    setWishlistModal({
+      itemId: item.id,
+      itemName: item.name,
+      printName,
+      day,
+      sizes: item.sizes,
+      price: item.price,
+    });
+  };
 
   // Get unique categories
   const categories = ['all', ...Array.from(new Set(items.map(item => item.category)))]
@@ -96,6 +122,7 @@ function App() {
               filterDay={filterDay}
               searchTerm={searchTerm}
               onPrintClick={(printName) => setSelectedPrint({ printName, itemName: item.name })}
+              onWishlistClick={(printName, day) => handleWishlistClick(item, printName, day)}
             />
           ))
         ) : (
@@ -110,7 +137,41 @@ function App() {
         itemName={selectedPrint?.itemName}
         onClose={() => setSelectedPrint(undefined)}
       />
+
+      {/* Wishlist toggle button */}
+      <button className="wishlist-toggle" onClick={() => setWishlistOpen(true)}>
+        <span className="heart">&#9825;</span>
+        <span>Wishlist</span>
+        {wishlistItems.length > 0 && (
+          <span className="count">{wishlistItems.length}</span>
+        )}
+      </button>
+
+      {/* Wishlist sidebar */}
+      <WishlistSidebar isOpen={wishlistOpen} onClose={() => setWishlistOpen(false)} />
+
+      {/* Add to wishlist modal */}
+      {wishlistModal && (
+        <AddToWishlistModal
+          isOpen={true}
+          onClose={() => setWishlistModal(null)}
+          itemId={wishlistModal.itemId}
+          itemName={wishlistModal.itemName}
+          printName={wishlistModal.printName}
+          day={wishlistModal.day}
+          sizes={wishlistModal.sizes}
+          price={wishlistModal.price}
+        />
+      )}
     </div>
+  )
+}
+
+function App() {
+  return (
+    <WishlistProvider>
+      <AppContent />
+    </WishlistProvider>
   )
 }
 

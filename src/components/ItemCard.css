@@ -175,3 +175,41 @@
   border-left: 3px solid #8e44ad;
   padding-left: 12px;
 }
+
+/* Wishlist button wrapper */
+.print-tag-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.wishlist-btn {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid #ddd;
+  font-size: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s, background 0.2s, transform 0.2s;
+  color: #999;
+  padding: 0;
+  line-height: 1;
+}
+
+.print-tag-wrapper:hover .wishlist-btn {
+  opacity: 1;
+}
+
+.wishlist-btn:hover {
+  background: #fff0f3;
+  border-color: #e91e63;
+  color: #e91e63;
+  transform: scale(1.1);
+}
