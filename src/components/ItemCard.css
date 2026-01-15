@@ -28,6 +28,17 @@
   font-weight: 600;
 }
 
+.item-link {
+  color: #000000;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.item-link:hover {
+  color: #667eea;
+  text-decoration: underline;
+}
+
 .category-badge {
   background-color: #D9C5A7;
   color: #000000;
@@ -211,5 +222,37 @@
   background: #fff0f3;
   border-color: #e91e63;
   color: #e91e63;
+  transform: scale(1.1);
+}
+
+.kyte-link-btn {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid #ddd;
+  font-size: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s, background 0.2s, transform 0.2s;
+  color: #999;
+  text-decoration: none;
+  line-height: 1;
+}
+
+.print-tag-wrapper:hover .kyte-link-btn {
+  opacity: 1;
+}
+
+.kyte-link-btn:hover {
+  background: #e3f2fd;
+  border-color: #2196f3;
+  color: #2196f3;
   transform: scale(1.1);
 }

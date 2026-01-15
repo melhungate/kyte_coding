@@ -1,6 +1,7 @@
 import React from 'react';
 import type { ClearanceItem } from '../data/clearanceData';
 import { getPrintImageUrl } from '../data/printImages';
+import { getKyteUrl, getKytePrintUrl } from '../utils/kyteUrls';
 import './ItemCard.css';
 
 type SaleDay = 'all' | 'friday' | 'sunday';
@@ -15,15 +16,20 @@ interface ItemCardProps {
 
 const PrintButton: React.FC<{
   print: string;
+  itemName: string;
   dayLabel?: string;
   onClick?: () => void;
   onWishlistClick?: () => void;
-}> = ({ print, dayLabel, onClick, onWishlistClick }) => {
+}> = ({ print, itemName, dayLabel, onClick, onWishlistClick }) => {
   const imageUrl = getPrintImageUrl(print);
 
   const handleWishlistClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     onWishlistClick?.();
+  };
+
+  const handleLinkClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
   };
 
   return (
@@ -47,6 +53,17 @@ const PrintButton: React.FC<{
           <span className="print-name-only">{print}</span>
         )}
       </button>
+      <a
+        href={getKytePrintUrl(print, itemName)}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="kyte-link-btn"
+        onClick={handleLinkClick}
+        title={`Search Kyte for ${print} ${itemName}`}
+        aria-label={`Search Kyte for ${print} ${itemName}`}
+      >
+        ↗
+      </a>
       <button
         className="wishlist-btn"
         onClick={handleWishlistClick}
@@ -82,6 +99,7 @@ export const ItemCard: React.FC<ItemCardProps> = ({ item, filterDay, searchTerm,
               <PrintButton
                 key={`fri-${index}`}
                 print={print}
+                itemName={item.name}
                 onClick={() => onPrintClick?.(print)}
                 onWishlistClick={() => onWishlistClick?.(print, 'friday')}
               />
@@ -100,6 +118,7 @@ export const ItemCard: React.FC<ItemCardProps> = ({ item, filterDay, searchTerm,
               <PrintButton
                 key={`sun-${index}`}
                 print={print}
+                itemName={item.name}
                 onClick={() => onPrintClick?.(print)}
                 onWishlistClick={() => onWishlistClick?.(print, 'sunday')}
               />
@@ -120,6 +139,7 @@ export const ItemCard: React.FC<ItemCardProps> = ({ item, filterDay, searchTerm,
                 <PrintButton
                   key={`fri-${index}`}
                   print={print}
+                  itemName={item.name}
                   dayLabel="Friday"
                   onClick={() => onPrintClick?.(print)}
                   onWishlistClick={() => onWishlistClick?.(print, 'friday')}
@@ -136,6 +156,7 @@ export const ItemCard: React.FC<ItemCardProps> = ({ item, filterDay, searchTerm,
                 <PrintButton
                   key={`sun-${index}`}
                   print={print}
+                  itemName={item.name}
                   dayLabel="Sunday"
                   onClick={() => onPrintClick?.(print)}
                   onWishlistClick={() => onWishlistClick?.(print, 'sunday')}
@@ -151,7 +172,11 @@ export const ItemCard: React.FC<ItemCardProps> = ({ item, filterDay, searchTerm,
   return (
     <div className="item-card">
       <div className="item-header">
-        <h3>{item.name}</h3>
+        <h3>
+          <a href={getKyteUrl(item.name)} target="_blank" rel="noopener noreferrer" className="item-link">
+            {item.name}
+          </a>
+        </h3>
         <span className="category-badge">{item.category}</span>
       </div>
 

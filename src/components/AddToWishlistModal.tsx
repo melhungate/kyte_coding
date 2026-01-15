@@ -14,6 +14,9 @@ interface AddToWishlistModalProps {
   price: string | undefined;
 }
 
+// Remove * from print names (used to indicate special size availability)
+const cleanPrintName = (name: string): string => name.replace(/\*$/, '');
+
 export const AddToWishlistModal: React.FC<AddToWishlistModalProps> = ({
   isOpen,
   onClose,
@@ -29,14 +32,15 @@ export const AddToWishlistModal: React.FC<AddToWishlistModalProps> = ({
   const priceOptions = parsePriceString(price);
   const [selectedSize, setSelectedSize] = useState(availableSizes[0] || 'One Size');
 
+  const cleanedPrintName = cleanPrintName(printName);
   const currentPrice = getPriceForSize(price, selectedSize);
-  const alreadyInWishlist = isInWishlist(itemId, printName);
+  const alreadyInWishlist = isInWishlist(itemId, cleanedPrintName);
 
   const handleAdd = () => {
     addItem({
       itemId,
       itemName,
-      printName,
+      printName: cleanedPrintName,
       size: selectedSize,
       price: currentPrice,
       day,
@@ -55,7 +59,7 @@ export const AddToWishlistModal: React.FC<AddToWishlistModalProps> = ({
 
         <div className="modal-item-info">
           <span className="modal-item-name">{itemName}</span>
-          <span className="modal-print-name">{printName}</span>
+          <span className="modal-print-name">{cleanedPrintName}</span>
           <span className={`modal-day ${day}`}>{day}</span>
         </div>
 
