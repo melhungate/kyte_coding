@@ -39,7 +39,7 @@ function App() {
   return (
     <div className="app">
       <header className="app-header">
-        <h1>🛍️ Kyte Clearance Sale</h1>
+        <h1>Kyte Clearance Sale - Jan 2026</h1>
         <p className="subtitle">Visual Browser for Clearance Items</p>
       </header>
 

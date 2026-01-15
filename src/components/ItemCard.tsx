@@ -130,7 +130,6 @@ export const ItemCard: React.FC<ItemCardProps> = ({ item, filterDay, onPrintClic
       <div className="item-meta">
         {item.price && <span className="price">{item.price}</span>}
         {item.sizes && <span className="sizes">Sizes: {item.sizes}</span>}
-        <span className="print-count">{totalPrints} prints total</span>
       </div>
 
       {renderPrintsSection()}
