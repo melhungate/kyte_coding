@@ -141,7 +141,7 @@ function AppContent() {
       {/* Wishlist toggle button */}
       <button className="wishlist-toggle" onClick={() => setWishlistOpen(true)}>
         <span className="heart">&#9825;</span>
-        <span>Wishlist</span>
+        <span className="label">Wishlist</span>
         {wishlistItems.length > 0 && (
           <span className="count">{wishlistItems.length}</span>
         )}
