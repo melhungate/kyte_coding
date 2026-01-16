@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useWishlist } from '../context/WishlistContext';
 import type { WishlistItem } from '../context/WishlistContext';
 import { formatPrice } from '../utils/priceUtils';
 import { getKytePrintUrl } from '../utils/kyteUrls';
+import { getPrintImageUrl } from '../data/printImages';
 import './WishlistSidebar.css';
 
 interface WishlistSidebarProps {
@@ -48,6 +49,7 @@ const downloadFile = (content: string, filename: string, mimeType: string) => {
 
 export const WishlistSidebar: React.FC<WishlistSidebarProps> = ({ isOpen, onClose }) => {
   const { items, removeItem, clearWishlist } = useWishlist();
+  const [isExpanded, setIsExpanded] = useState(false);
 
   const fridayItems = items.filter(item => item.day === 'friday');
   const sundayItems = items.filter(item => item.day === 'sunday');
@@ -63,12 +65,22 @@ export const WishlistSidebar: React.FC<WishlistSidebarProps> = ({ isOpen, onClos
   return (
     <>
       <div className={`wishlist-overlay ${isOpen ? 'open' : ''}`} onClick={onClose} />
-      <div className={`wishlist-sidebar ${isOpen ? 'open' : ''}`}>
+      <div className={`wishlist-sidebar ${isOpen ? 'open' : ''} ${isExpanded ? 'expanded' : ''}`}>
         <div className="wishlist-header">
           <h2>Wishlist ({items.length})</h2>
-          <button className="close-btn" onClick={onClose} aria-label="Close wishlist">
-            &times;
-          </button>
+          <div className="header-buttons">
+            <button
+              className="expand-btn"
+              onClick={() => setIsExpanded(!isExpanded)}
+              aria-label={isExpanded ? 'Collapse wishlist' : 'Expand wishlist'}
+              title={isExpanded ? 'Collapse' : 'Expand'}
+            >
+              {isExpanded ? '→' : '←'}
+            </button>
+            <button className="close-btn" onClick={onClose} aria-label="Close wishlist">
+              &times;
+            </button>
+          </div>
         </div>
 
         <div className="wishlist-content">
@@ -79,28 +91,36 @@ export const WishlistSidebar: React.FC<WishlistSidebarProps> = ({ isOpen, onClos
             </div>
           ) : (
             <ul className="wishlist-items">
-              {items.map(item => (
-                <li key={item.id} className="wishlist-item">
-                  <div className="item-info">
-                    <span className="item-name">{item.itemName}</span>
-                    <span className="print-name">{item.printName}</span>
-                    <div className="item-details">
-                      <span className={`day-badge ${item.day}`}>{item.day}</span>
-                      <span className="size-badge">Size: {item.size}</span>
+              {items.map(item => {
+                const imageUrl = getPrintImageUrl(item.printName);
+                return (
+                  <li key={item.id} className="wishlist-item">
+                    {imageUrl && (
+                      <div className="item-swatch">
+                        <img src={imageUrl} alt={item.printName} />
+                      </div>
+                    )}
+                    <div className="item-info">
+                      <span className="item-name">{item.itemName}</span>
+                      <span className="print-name">{item.printName}</span>
+                      <div className="item-details">
+                        <span className={`day-badge ${item.day}`}>{item.day}</span>
+                        <span className="size-badge">Size: {item.size}</span>
+                      </div>
                     </div>
-                  </div>
-                  <div className="item-actions">
-                    <span className="item-price">{formatPrice(item.price)}</span>
-                    <button
-                      className="remove-btn"
-                      onClick={() => removeItem(item.id)}
-                      aria-label="Remove from wishlist"
-                    >
-                      &times;
-                    </button>
-                  </div>
-                </li>
-              ))}
+                    <div className="item-actions">
+                      <span className="item-price">{formatPrice(item.price)}</span>
+                      <button
+                        className="remove-btn"
+                        onClick={() => removeItem(item.id)}
+                        aria-label="Remove from wishlist"
+                      >
+                        &times;
+                      </button>
+                    </div>
+                  </li>
+                );
+              })}
             </ul>
           )}
         </div>
