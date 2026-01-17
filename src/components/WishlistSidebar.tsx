@@ -47,15 +47,85 @@ const downloadFile = (content: string, filename: string, mimeType: string) => {
   URL.revokeObjectURL(url);
 };
 
+// Group items by body style, then by print
+interface PrintGroup {
+  printName: string;
+  itemName: string;
+  imageUrl: string | undefined;
+  items: WishlistItem[];
+  totalPrice: number;
+}
+
+interface BodyStyleGroup {
+  itemName: string;
+  prints: PrintGroup[];
+  totalPrice: number;
+}
+
+const groupItems = (items: WishlistItem[]): BodyStyleGroup[] => {
+  const bodyStyleMap = new Map<string, Map<string, WishlistItem[]>>();
+
+  // Group by itemName, then by printName
+  items.forEach(item => {
+    if (!bodyStyleMap.has(item.itemName)) {
+      bodyStyleMap.set(item.itemName, new Map());
+    }
+    const printMap = bodyStyleMap.get(item.itemName)!;
+    if (!printMap.has(item.printName)) {
+      printMap.set(item.printName, []);
+    }
+    printMap.get(item.printName)!.push(item);
+  });
+
+  // Convert to array structure
+  const result: BodyStyleGroup[] = [];
+  bodyStyleMap.forEach((printMap, itemName) => {
+    const prints: PrintGroup[] = [];
+    let bodyStyleTotal = 0;
+
+    printMap.forEach((printItems, printName) => {
+      const printTotal = printItems.reduce((sum, item) => sum + item.price, 0);
+      bodyStyleTotal += printTotal;
+      prints.push({
+        printName,
+        itemName,
+        imageUrl: getPrintImageUrl(printName),
+        items: printItems,
+        totalPrice: printTotal,
+      });
+    });
+
+    result.push({
+      itemName,
+      prints,
+      totalPrice: bodyStyleTotal,
+    });
+  });
+
+  return result;
+};
+
+type DayFilter = 'all' | 'friday' | 'sunday';
+
 export const WishlistSidebar: React.FC<WishlistSidebarProps> = ({ isOpen, onClose }) => {
   const { items, removeItem, clearWishlist } = useWishlist();
   const [isExpanded, setIsExpanded] = useState(false);
+  const [dayFilter, setDayFilter] = useState<DayFilter>('all');
 
+  // Filter items based on selected day
+  const filteredItems = dayFilter === 'all'
+    ? items
+    : items.filter(item => item.day === dayFilter);
+
+  const groupedItems = groupItems(filteredItems);
   const fridayItems = items.filter(item => item.day === 'friday');
   const sundayItems = items.filter(item => item.day === 'sunday');
   const fridayTotal = fridayItems.reduce((sum, item) => sum + item.price, 0);
   const sundayTotal = sundayItems.reduce((sum, item) => sum + item.price, 0);
   const grandTotal = fridayTotal + sundayTotal;
+
+  // Calculate filtered total
+  const filteredTotal = filteredItems.reduce((sum, item) => sum + item.price, 0);
 
   const handleExport = () => {
     const content = generateCsvContent(items);
@@ -83,6 +153,29 @@ export const WishlistSidebar: React.FC<WishlistSidebarProps> = ({ isOpen, onClos
           </div>
         </div>
 
+        {items.length > 0 && (
+          <div className="day-filter">
+            <button
+              className={`filter-btn ${dayFilter === 'all' ? 'active' : ''}`}
+              onClick={() => setDayFilter('all')}
+            >
+              All ({items.length})
+            </button>
+            <button
+              className={`filter-btn friday ${dayFilter === 'friday' ? 'active' : ''}`}
+              onClick={() => setDayFilter('friday')}
+            >
+              Friday ({fridayItems.length})
+            </button>
+            <button
+              className={`filter-btn sunday ${dayFilter === 'sunday' ? 'active' : ''}`}
+              onClick={() => setDayFilter('sunday')}
+            >
+              Sunday ({sundayItems.length})
+            </button>
+          </div>
+        )}
+
         <div className="wishlist-content">
           {items.length === 0 ? (
             <div className="wishlist-empty">
@@ -90,65 +183,86 @@ export const WishlistSidebar: React.FC<WishlistSidebarProps> = ({ isOpen, onClos
               <p className="hint">Click the heart icon on any print to add it!</p>
             </div>
           ) : (
-            <ul className="wishlist-items">
-              {items.map(item => {
-                const imageUrl = getPrintImageUrl(item.printName);
-                return (
-                  <li key={item.id} className="wishlist-item">
-                    {imageUrl && (
-                      <div className="item-swatch">
-                        <img src={imageUrl} alt={item.printName} />
+            <div className="wishlist-grouped">
+              {groupedItems.map(bodyStyle => (
+                <div key={bodyStyle.itemName} className="body-style-group">
+                  <div className="body-style-header">
+                    <span className="body-style-name">{bodyStyle.itemName}</span>
+                    <span className="body-style-total">{formatPrice(bodyStyle.totalPrice)}</span>
+                  </div>
+                  <div className="prints-list">
+                    {bodyStyle.prints.map(print => (
+                      <div key={print.printName} className="print-group">
+                        <div className="print-group-header">
+                          {print.imageUrl && (
+                            <div className="item-swatch">
+                              <img src={print.imageUrl} alt={print.printName} />
+                            </div>
+                          )}
+                          <div className="print-group-info">
+                            <a
+                              href={getKytePrintUrl(print.printName, print.itemName)}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="print-name-link"
+                              title={`Search Kyte for ${print.printName} ${print.itemName}`}
+                            >
+                              {print.printName}
+                            </a>
+                            {print.items.length > 1 && (
+                              <span className="print-qty">x{print.items.length}</span>
+                            )}
+                          </div>
+                          <span className="print-total">{formatPrice(print.totalPrice)}</span>
+                        </div>
+                        <div className="size-list">
+                          {print.items.map(item => (
+                            <div key={item.id} className="size-item">
+                              <div className="size-item-info">
+                                <span className={`day-badge ${item.day}`}>{item.day}</span>
+                                <span className="size-badge">{item.size}</span>
+                                <span className="size-price">{formatPrice(item.price)}</span>
+                              </div>
+                              <button
+                                className="remove-btn"
+                                onClick={() => removeItem(item.id)}
+                                aria-label="Remove from wishlist"
+                              >
+                                &times;
+                              </button>
+                            </div>
+                          ))}
+                        </div>
                       </div>
-                    )}
-                    <div className="item-info">
-                      <span className="item-name">{item.itemName}</span>
-                      <span className="print-name">{item.printName}</span>
-                      <div className="item-details">
-                        <span className={`day-badge ${item.day}`}>{item.day}</span>
-                        <span className="size-badge">Size: {item.size}</span>
-                      </div>
-                    </div>
-                    <div className="item-actions">
-                      <span className="item-price">{formatPrice(item.price)}</span>
-                      <button
-                        className="remove-btn"
-                        onClick={() => removeItem(item.id)}
-                        aria-label="Remove from wishlist"
-                      >
-                        &times;
-                      </button>
-                    </div>
-                  </li>
-                );
-              })}
-            </ul>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
           )}
         </div>
 
         {items.length > 0 && (
           <div className="wishlist-footer">
-            {fridayItems.length > 0 && (
-              <div className="day-total-row friday">
-                <span>Friday ({fridayItems.length}):</span>
-                <span className="day-total">{formatPrice(fridayTotal)}</span>
+            <div className="footer-top">
+              <div className="day-subtotals">
+                {fridayItems.length > 0 && (
+                  <span className="subtotal friday">Fri: {formatPrice(fridayTotal)}</span>
+                )}
+                {sundayItems.length > 0 && (
+                  <span className="subtotal sunday">Sun: {formatPrice(sundayTotal)}</span>
+                )}
               </div>
-            )}
-            {sundayItems.length > 0 && (
-              <div className="day-total-row sunday">
-                <span>Sunday ({sundayItems.length}):</span>
-                <span className="day-total">{formatPrice(sundayTotal)}</span>
+              <div className="total-display">
+                <span className="total-price">{formatPrice(dayFilter === 'all' ? grandTotal : filteredTotal)}</span>
               </div>
-            )}
-            <div className="total-row">
-              <span>Grand Total:</span>
-              <span className="total-price">{formatPrice(grandTotal)}</span>
             </div>
             <div className="footer-buttons">
               <button className="export-btn" onClick={handleExport}>
-                Export Wishlist
+                Export
               </button>
               <button className="clear-btn" onClick={clearWishlist}>
-                Clear Wishlist
+                Clear
               </button>
             </div>
           </div>
