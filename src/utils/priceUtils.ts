@@ -15,13 +15,17 @@ const ALL_SIZES_ORDERED = [
   '0-6M',
   '3-6M',
   '6-12M',
+  '6-18M',
+  '6-24M',
   '12-18M',
   '12-24M',
   '18-24M',
+  '18-36M',
   '1-2T',
   '1-4T',
   '2T',
   '2T-4T',
+  '2T-6T',
   '2-6T',
   '3T',
   '4T',
@@ -33,12 +37,15 @@ const ALL_SIZES_ORDERED = [
   '9',
   '10',
   'XS',
+  'XS/S',
   'S',
   'S/M',
   'M',
+  'M/L',
   'L',
   'L/XL',
   'XL',
+  'XL/XXL',
   'XXL',
   '2XL',
   '3XL',
@@ -50,17 +57,21 @@ const SIZE_SEQUENCES: { [key: string]: string[] } = {
   // Baby month sizes
   'preemie-to-baby': ['Preemie', 'NB', '0-3M', '3-6M', '6-12M', '12-18M', '18-24M'],
   'nb-to-baby': ['NB', '0-3M', '3-6M', '6-12M', '12-18M', '18-24M'],
+  'nb-to-6-12m': ['NB', '0-3M', '3-6M', '6-12M'],
 
   // NB to toddler
   'nb-to-toddler-4t': ['NB', '0-3M', '3-6M', '6-12M', '12-18M', '18-24M', '2T', '3T', '4T'],
   'nb-to-toddler-7': ['NB', '0-3M', '3-6M', '6-12M', '12-18M', '18-24M', '2T', '3T', '4T', '5T', '6T', '7'],
+  'nb-to-toddler-7t': ['NB', '0-3M', '3-6M', '6-12M', '12-18M', '18-24M', '2T', '3T', '4T', '5T', '6T', '7T'],
 
   // Baby to toddler (starting from 0-3M)
   'baby-to-toddler-4t': ['0-3M', '3-6M', '6-12M', '12-18M', '18-24M', '2T', '3T', '4T'],
   'baby-to-toddler-7': ['0-3M', '3-6M', '6-12M', '12-18M', '18-24M', '2T', '3T', '4T', '5T', '6T', '7'],
+  'baby-to-toddler-7t': ['0-3M', '3-6M', '6-12M', '12-18M', '18-24M', '2T', '3T', '4T', '5T', '6T', '7T'],
   '12m-to-7': ['12-18M', '18-24M', '2T', '3T', '4T', '5T', '6T', '7'],
   '12m-to-7t': ['12-18M', '18-24M', '2T', '3T', '4T', '5T', '6T', '7T'],
   '12m-to-10': ['12-18M', '18-24M', '2T', '3T', '4T', '5T', '6T', '7', '8', '9', '10'],
+  '18m-to-7t': ['18-24M', '2T', '3T', '4T', '5T', '6T', '7T'],
   '18m-to-10': ['18-24M', '2T', '3T', '4T', '5T', '6T', '7', '8', '9', '10'],
 
   // Toddler to kids
@@ -69,7 +80,9 @@ const SIZE_SEQUENCES: { [key: string]: string[] } = {
 
   // Adult sizes
   'adult-combo': ['S/M', 'L/XL'],
+  'adult-combo-extended': ['XS/S', 'S/M', 'M/L', 'L/XL', 'XL/XXL'],
   'adult-xs-xxl': ['XS', 'S', 'M', 'L', 'XL', 'XXL'],
+  'adult-s-xxl': ['S', 'M', 'L', 'XL', 'XXL'],
   'adult-xs-3xl': ['XS', 'S', 'M', 'L', 'XL', 'XXL', '3XL'],
   'adult-standard': ['XS', 'S', 'M', 'L', 'XL', '2XL', '3XL', '4XL'],
   'adult-s-xl': ['S', 'M', 'L', 'XL'],
@@ -77,13 +90,19 @@ const SIZE_SEQUENCES: { [key: string]: string[] } = {
   // NB to adult
   'nb-to-adult': ['NB', 'XS', 'S', 'M', 'L', 'XL', '2XL', '3XL', '4XL'],
 
-  // Alternate baby sizes
+  // Alternate baby sizes (0-6M line)
   '0-6m-to-7': ['0-6M', '6-12M', '12-24M', '2T', '3T', '4T', '5T', '6T', '7'],
+  '0-6m-to-7t': ['0-6M', '6-12M', '12-24M', '2T', '3T', '4T', '5T', '6T', '7T'],
+  '0-6m-to-2t-6t': ['0-6M', '6-24M', '2T-6T'],
 
   // Special combo sizes
-  'baby-combo-4t': ['0-3M', '3-6M', '6-12M', '1-4T'],
+  'baby-combo-1-4t': ['0-3M', '3-6M', '6-12M', '1-4T'],
   'baby-combo-2t-4t': ['0-3M', '3-6M', '6-12M', '12-24M', '2T-4T'],
   'baby-combo-2-6t': ['0-3M', '3-6M', '6-12M', '1-2T', '2-6T'],
+  '6-18m-to-4t': ['6-18M', '18-36M', '4T'],
+
+  // Adult combo sizes
+  'adult-combo-3': ['XS/S', 'M/L', 'XL/XXL'],
 };
 
 // Normalize size string (handle slashes, convert to standard format)
@@ -96,8 +115,8 @@ function normalizeSize(size: string): string {
     normalized = normalized.replace('/', '-');
   }
 
-  // Handle "6/12M" -> "6-12M"
-  if (/^\d+\/\d+M$/i.test(normalized)) {
+  // Handle toddler sizes with slashes: "1/4T" -> "1-4T", "2/6T" -> "2-6T"
+  if (/^\d+\/\d+T$/i.test(normalized)) {
     normalized = normalized.replace('/', '-');
   }
 
