@@ -310,7 +310,7 @@ export const WishlistSidebar: React.FC<WishlistSidebarProps> = ({ isOpen, onClos
             </div>
           ) : (
             <div className="wishlist-grouped">
-              {groupedItems.map((bodyStyle, bodyStyleIndex) => (
+              {groupedItems.map((bodyStyle) => (
                 <div
                   key={bodyStyle.itemName}
                   className={`body-style-group ${
@@ -333,7 +333,7 @@ export const WishlistSidebar: React.FC<WishlistSidebarProps> = ({ isOpen, onClos
                     <span className="body-style-total">{formatPrice(bodyStyle.totalPrice)}</span>
                   </div>
                   <div className="prints-list">
-                    {bodyStyle.prints.map((print, printIndex) => (
+                    {bodyStyle.prints.map((print) => (
                       <div
                         key={print.printName}
                         className={`print-group ${

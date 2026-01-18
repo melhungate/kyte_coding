@@ -594,11 +594,14 @@
 /* Mobile responsive styles */
 @media (max-width: 600px) {
   .wishlist-toggle {
-    padding: 10px;
-    border-radius: 50%;
-    width: 48px;
-    height: 48px;
-    justify-content: center;
+    padding: 6px 10px;
+    border-radius: 20px;
+    width: auto;
+    height: auto;
+    top: 12px;
+    right: 12px;
+    gap: 4px;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.4);
   }
 
   .wishlist-toggle .label {
@@ -606,16 +609,13 @@
   }
 
   .wishlist-toggle .heart {
-    font-size: 1.3rem;
+    font-size: 0.9rem;
   }
 
   .wishlist-toggle .count {
-    position: absolute;
-    top: -4px;
-    right: -4px;
-    padding: 2px 6px;
-    font-size: 0.65rem;
-    min-width: 18px;
+    padding: 1px 5px;
+    font-size: 0.6rem;
+    min-width: 16px;
   }
 
   .wishlist-sidebar {

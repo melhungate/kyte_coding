@@ -231,8 +231,27 @@
   }
 
   .wishlist-toggle {
-    top: auto;
-    bottom: 20px;
-    right: 20px;
+    top: 10px;
+    bottom: auto;
+    right: 10px;
+    padding: 6px 10px;
+    border-radius: 16px;
+    font-size: 12px;
+    gap: 4px;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.4);
+  }
+
+  .wishlist-toggle .heart {
+    font-size: 12px;
+  }
+
+  .wishlist-toggle .label {
+    display: none;
+  }
+
+  .wishlist-toggle .count {
+    padding: 1px 5px;
+    font-size: 10px;
+    min-width: 14px;
   }
 }
