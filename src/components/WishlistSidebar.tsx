@@ -62,7 +62,11 @@ interface BodyStyleGroup {
   totalPrice: number;
 }
 
-const groupItems = (items: WishlistItem[]): BodyStyleGroup[] => {
+const groupItems = (
+  items: WishlistItem[],
+  bodyStyleOrder: string[],
+  printOrder: Record<string, string[]>
+): BodyStyleGroup[] => {
   const bodyStyleMap = new Map<string, Map<string, WishlistItem[]>>();
 
   // Group by itemName, then by printName
@@ -77,13 +81,43 @@ const groupItems = (items: WishlistItem[]): BodyStyleGroup[] => {
     printMap.get(item.printName)!.push(item);
   });
 
-  // Convert to array structure
+  // Convert to array structure with ordering
   const result: BodyStyleGroup[] = [];
-  bodyStyleMap.forEach((printMap, itemName) => {
+
+  // Get all body styles present in items
+  const presentBodyStyles = Array.from(bodyStyleMap.keys());
+
+  // Sort by custom order, with unordered items at the end
+  const sortedBodyStyles = [...presentBodyStyles].sort((a, b) => {
+    const aIndex = bodyStyleOrder.indexOf(a);
+    const bIndex = bodyStyleOrder.indexOf(b);
+    if (aIndex === -1 && bIndex === -1) return 0;
+    if (aIndex === -1) return 1;
+    if (bIndex === -1) return -1;
+    return aIndex - bIndex;
+  });
+
+  sortedBodyStyles.forEach(itemName => {
+    const printMap = bodyStyleMap.get(itemName)!;
     const prints: PrintGroup[] = [];
     let bodyStyleTotal = 0;
 
-    printMap.forEach((printItems, printName) => {
+    // Get all prints for this body style
+    const presentPrints = Array.from(printMap.keys());
+    const customPrintOrder = printOrder[itemName] || [];
+
+    // Sort by custom order
+    const sortedPrints = [...presentPrints].sort((a, b) => {
+      const aIndex = customPrintOrder.indexOf(a);
+      const bIndex = customPrintOrder.indexOf(b);
+      if (aIndex === -1 && bIndex === -1) return 0;
+      if (aIndex === -1) return 1;
+      if (bIndex === -1) return -1;
+      return aIndex - bIndex;
+    });
+
+    sortedPrints.forEach(printName => {
+      const printItems = printMap.get(printName)!;
       const printTotal = printItems.reduce((sum, item) => sum + item.price, 0);
       bodyStyleTotal += printTotal;
       prints.push({
@@ -106,18 +140,35 @@ const groupItems = (items: WishlistItem[]): BodyStyleGroup[] => {
 };
 
 type DayFilter = 'all' | 'friday' | 'sunday';
+type DragType = 'bodyStyle' | 'print' | null;
 
 export const WishlistSidebar: React.FC<WishlistSidebarProps> = ({ isOpen, onClose }) => {
-  const { items, removeItem, clearWishlist } = useWishlist();
+  const {
+    items,
+    bodyStyleOrder,
+    printOrder,
+    removeItem,
+    reorderBodyStyles,
+    reorderPrints,
+    clearWishlist
+  } = useWishlist();
+
   const [isExpanded, setIsExpanded] = useState(false);
   const [dayFilter, setDayFilter] = useState<DayFilter>('all');
+
+  // Drag state
+  const [dragType, setDragType] = useState<DragType>(null);
+  const [draggedBodyStyle, setDraggedBodyStyle] = useState<string | null>(null);
+  const [dragOverBodyStyle, setDragOverBodyStyle] = useState<string | null>(null);
+  const [draggedPrint, setDraggedPrint] = useState<{ bodyStyle: string; print: string } | null>(null);
+  const [dragOverPrint, setDragOverPrint] = useState<{ bodyStyle: string; print: string } | null>(null);
 
   // Filter items based on selected day
   const filteredItems = dayFilter === 'all'
     ? items
     : items.filter(item => item.day === dayFilter);
 
-  const groupedItems = groupItems(filteredItems);
+  const groupedItems = groupItems(filteredItems, bodyStyleOrder, printOrder);
   const fridayItems = items.filter(item => item.day === 'friday');
   const sundayItems = items.filter(item => item.day === 'sunday');
   const fridayTotal = fridayItems.reduce((sum, item) => sum + item.price, 0);
@@ -130,6 +181,81 @@ export const WishlistSidebar: React.FC<WishlistSidebarProps> = ({ isOpen, onClos
   const handleExport = () => {
     const content = generateCsvContent(items);
     downloadFile(content, 'kyte-wishlist.csv', 'text/csv');
+  };
+
+  // Body style drag handlers
+  const handleBodyStyleDragStart = (e: React.DragEvent, itemName: string) => {
+    setDragType('bodyStyle');
+    setDraggedBodyStyle(itemName);
+    e.dataTransfer.effectAllowed = 'move';
+    // Set a drag image
+    const target = e.currentTarget as HTMLElement;
+    e.dataTransfer.setDragImage(target, 20, 20);
+  };
+
+  const handleBodyStyleDragOver = (e: React.DragEvent, itemName: string) => {
+    e.preventDefault();
+    if (dragType === 'bodyStyle' && draggedBodyStyle !== itemName) {
+      setDragOverBodyStyle(itemName);
+    }
+  };
+
+  const handleBodyStyleDragLeave = () => {
+    setDragOverBodyStyle(null);
+  };
+
+  const handleBodyStyleDrop = (e: React.DragEvent, targetItemName: string) => {
+    e.preventDefault();
+    if (dragType === 'bodyStyle' && draggedBodyStyle && draggedBodyStyle !== targetItemName) {
+      reorderBodyStyles(draggedBodyStyle, targetItemName);
+    }
+    resetDragState();
+  };
+
+  // Print drag handlers
+  const handlePrintDragStart = (e: React.DragEvent, bodyStyle: string, printName: string) => {
+    e.stopPropagation();
+    setDragType('print');
+    setDraggedPrint({ bodyStyle, print: printName });
+    e.dataTransfer.effectAllowed = 'move';
+  };
+
+  const handlePrintDragOver = (e: React.DragEvent, bodyStyle: string, printName: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (dragType === 'print' && draggedPrint &&
+        draggedPrint.bodyStyle === bodyStyle &&
+        draggedPrint.print !== printName) {
+      setDragOverPrint({ bodyStyle, print: printName });
+    }
+  };
+
+  const handlePrintDragLeave = (e: React.DragEvent) => {
+    e.stopPropagation();
+    setDragOverPrint(null);
+  };
+
+  const handlePrintDrop = (e: React.DragEvent, bodyStyle: string, targetPrint: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (dragType === 'print' && draggedPrint &&
+        draggedPrint.bodyStyle === bodyStyle &&
+        draggedPrint.print !== targetPrint) {
+      reorderPrints(bodyStyle, draggedPrint.print, targetPrint);
+    }
+    resetDragState();
+  };
+
+  const resetDragState = () => {
+    setDragType(null);
+    setDraggedBodyStyle(null);
+    setDragOverBodyStyle(null);
+    setDraggedPrint(null);
+    setDragOverPrint(null);
+  };
+
+  const handleDragEnd = () => {
+    resetDragState();
   };
 
   return (
@@ -184,16 +310,48 @@ export const WishlistSidebar: React.FC<WishlistSidebarProps> = ({ isOpen, onClos
             </div>
           ) : (
             <div className="wishlist-grouped">
-              {groupedItems.map(bodyStyle => (
-                <div key={bodyStyle.itemName} className="body-style-group">
+              {groupedItems.map((bodyStyle, bodyStyleIndex) => (
+                <div
+                  key={bodyStyle.itemName}
+                  className={`body-style-group ${
+                    draggedBodyStyle === bodyStyle.itemName ? 'dragging' : ''
+                  } ${
+                    dragOverBodyStyle === bodyStyle.itemName ? 'drag-over' : ''
+                  }`}
+                  draggable
+                  onDragStart={(e) => handleBodyStyleDragStart(e, bodyStyle.itemName)}
+                  onDragOver={(e) => handleBodyStyleDragOver(e, bodyStyle.itemName)}
+                  onDragLeave={handleBodyStyleDragLeave}
+                  onDrop={(e) => handleBodyStyleDrop(e, bodyStyle.itemName)}
+                  onDragEnd={handleDragEnd}
+                >
                   <div className="body-style-header">
-                    <span className="body-style-name">{bodyStyle.itemName}</span>
+                    <div className="body-style-drag-area">
+                      <span className="drag-handle" title="Drag to reorder">⋮⋮</span>
+                      <span className="body-style-name">{bodyStyle.itemName}</span>
+                    </div>
                     <span className="body-style-total">{formatPrice(bodyStyle.totalPrice)}</span>
                   </div>
                   <div className="prints-list">
-                    {bodyStyle.prints.map(print => (
-                      <div key={print.printName} className="print-group">
+                    {bodyStyle.prints.map((print, printIndex) => (
+                      <div
+                        key={print.printName}
+                        className={`print-group ${
+                          draggedPrint?.bodyStyle === bodyStyle.itemName &&
+                          draggedPrint?.print === print.printName ? 'dragging' : ''
+                        } ${
+                          dragOverPrint?.bodyStyle === bodyStyle.itemName &&
+                          dragOverPrint?.print === print.printName ? 'drag-over' : ''
+                        }`}
+                        draggable
+                        onDragStart={(e) => handlePrintDragStart(e, bodyStyle.itemName, print.printName)}
+                        onDragOver={(e) => handlePrintDragOver(e, bodyStyle.itemName, print.printName)}
+                        onDragLeave={handlePrintDragLeave}
+                        onDrop={(e) => handlePrintDrop(e, bodyStyle.itemName, print.printName)}
+                        onDragEnd={handleDragEnd}
+                      >
                         <div className="print-group-header">
+                          <span className="drag-handle small" title="Drag to reorder">⋮⋮</span>
                           {print.imageUrl && (
                             <div className="item-swatch">
                               <img src={print.imageUrl} alt={print.printName} />
@@ -206,6 +364,7 @@ export const WishlistSidebar: React.FC<WishlistSidebarProps> = ({ isOpen, onClos
                               rel="noopener noreferrer"
                               className="print-name-link"
                               title={`Search Kyte for ${print.printName} ${print.itemName}`}
+                              onClick={(e) => e.stopPropagation()}
                             >
                               {print.printName}
                             </a>

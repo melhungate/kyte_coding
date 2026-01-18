@@ -178,22 +178,46 @@
 .body-style-group {
   background: #f9f9f9;
   border-radius: 10px;
-  border: 1px solid #e0e0e0;
+  border: 2px solid #e0e0e0;
   overflow: hidden;
+  transition: transform 0.2s, opacity 0.2s, border-color 0.2s, box-shadow 0.2s;
+  cursor: grab;
+}
+
+.body-style-group:active {
+  cursor: grabbing;
+}
+
+.body-style-group.dragging {
+  opacity: 0.5;
+  transform: scale(0.98);
+  border-color: #667eea;
+}
+
+.body-style-group.drag-over {
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.3);
+  transform: scale(1.02);
 }
 
 .body-style-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 16px;
+  padding: 10px 12px;
   background: linear-gradient(135deg, #667eea20 0%, #764ba220 100%);
   border-bottom: 1px solid #e0e0e0;
 }
 
+.body-style-drag-area {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .body-style-name {
   font-weight: 700;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   color: #333;
 }
 
@@ -211,11 +235,29 @@
   background: white;
   border-radius: 8px;
   margin-bottom: 8px;
-  border: 1px solid #eee;
+  border: 2px solid #eee;
+  transition: transform 0.2s, opacity 0.2s, border-color 0.2s, box-shadow 0.2s;
+  cursor: grab;
+}
+
+.print-group:active {
+  cursor: grabbing;
 }
 
 .print-group:last-child {
   margin-bottom: 0;
+}
+
+.print-group.dragging {
+  opacity: 0.5;
+  transform: scale(0.98);
+  border-color: #764ba2;
+}
+
+.print-group.drag-over {
+  border-color: #764ba2;
+  box-shadow: 0 0 0 2px rgba(118, 75, 162, 0.3);
+  transform: scale(1.01);
 }
 
 .print-group-header {
@@ -270,7 +312,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 6px 0;
+  padding: 4px 0;
   border-bottom: 1px solid #f5f5f5;
 }
 
@@ -278,10 +320,29 @@
   border-bottom: none;
 }
 
+.drag-handle {
+  color: #ccc;
+  font-size: 0.75rem;
+  cursor: grab;
+  padding: 2px 6px;
+  user-select: none;
+  transition: color 0.15s;
+}
+
+.drag-handle:hover {
+  color: #667eea;
+}
+
+.drag-handle.small {
+  font-size: 0.65rem;
+  padding: 2px 4px;
+}
+
 .size-item-info {
   display: flex;
   align-items: center;
   gap: 8px;
+  flex: 1;
 }
 
 .size-price {
